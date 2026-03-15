@@ -869,3 +869,5 @@ print("""Processo 100% finalizado! Você já pode usar seus dados no BD!
  - Desenvolvido por: Aphonso Henrique do Amaral Rafael
  - Contribua com esse projeto aqui: https://github.com/aphonsoar/Receita_Federal_do_Brasil_-_Dados_Publicos_CNPJ
 """)
+
+#teste
