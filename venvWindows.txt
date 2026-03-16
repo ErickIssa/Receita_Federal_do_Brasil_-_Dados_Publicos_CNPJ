@@ -1,0 +1,35 @@
+Como ativar o ambiente virtual (venv) no Windows
+
+Passo a passo para ativar o venv em um projeto Python.
+
+1.  Abra o terminal (PowerShell ou Prompt de Comando).
+
+2.  Vá até a pasta do projeto:
+
+    cd Receita_Federal_do_Brasil_-_Dados_Publicos_CNPJ
+
+3.  Se o ambiente virtual ainda não existir, crie:
+
+    python -m venv venv
+
+4.  Ativar o ambiente virtual:
+
+    No PowerShell: venv.ps1
+
+    No Prompt de Comando (cmd): venv.bat
+
+5.  Quando o ambiente estiver ativo, o terminal mostrará algo como:
+
+    (venv) C:_usuarioFederal_do_Brasil-_Dados_Publicos_CNPJ>
+
+6.  Agora você pode instalar as dependências do projeto:
+
+    pip install -r requirements.txt
+
+7.  Para rodar o script do projeto:
+
+    python code_coletar_dados_e_gravar_BD.py
+
+8.  Para sair do ambiente virtual:
+
+    deactivate
