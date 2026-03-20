@@ -1,7 +1,6 @@
 import datetime
 import gc
 import pathlib
-from dotenv import load_dotenv
 from sqlalchemy import create_engine
 import bs4 as bs
 import ftplib
@@ -65,40 +64,19 @@ def to_sql(dataframe, **kwargs):
     sys.stdout.write('\n')
 
 #%%
-# Ler arquivo de configuração de ambiente # https://dev.to/jakewitcher/using-env-files-for-environment-variables-in-python-applications-55a1
-def getEnv(env):
-    return os.getenv(env)
-
-
 current_path = pathlib.Path().resolve()
-dotenv_path = os.path.join(current_path, '.env')
-if not os.path.isfile(dotenv_path):
-    print('Especifique o local do seu arquivo de configuração ".env". Por exemplo: C:\...\Receita_Federal_do_Brasil_-_Dados_Publicos_CNPJ\code')
-    # C:\Aphonso_C\Git\Receita_Federal_do_Brasil_-_Dados_Publicos_CNPJ\code
-    local_env = input()
-    dotenv_path = os.path.join(local_env, '.env')
-print(dotenv_path)
-load_dotenv(dotenv_path=dotenv_path)
 
 dados_rf = 'http://200.152.38.155/CNPJ/'
 
-#%%
-# Read details from ".env" file:
-output_files = None
-extracted_files = None
-try:
-    output_files = getEnv('OUTPUT_FILES_PATH')
-    makedirs(output_files)
+output_files = os.path.join(current_path, 'output_files')
+makedirs(output_files)
 
-    extracted_files = getEnv('EXTRACTED_FILES_PATH')
-    makedirs(extracted_files)
+extracted_files = os.path.join(current_path, 'extracted_files')
+makedirs(extracted_files)
 
-    print('Diretórios definidos: \n' +
-          'output_files: ' + str(output_files)  + '\n' +
-          'extracted_files: ' + str(extracted_files))
-except:
-    pass
-    print('Erro na definição dos diretórios, verifique o arquivo ".env" ou o local informado do seu arquivo de configuração.')
+print('Diretórios definidos: \n' +
+      'output_files: ' + str(output_files)  + '\n' +
+      'extracted_files: ' + str(extracted_files))
 
 #%%
 raw_html = urllib.request.urlopen(dados_rf)
@@ -230,9 +208,7 @@ for i in range(len(Items)):
 #%%
 # Conectar no banco de dados:
 # Dados da conexão com o BD (utilizando SQLite)
-database=getEnv('DB_NAME')
-if not database:
-    database = 'cnpj_dados'
+database = 'cnpj_dados'
 
 # Conectar:
 engine = create_engine(f'sqlite:///{database}.db')
