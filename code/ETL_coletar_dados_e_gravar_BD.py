@@ -8,7 +8,7 @@ import ftplib
 import gzip
 import os
 import pandas as pd
-import psycopg2
+import sqlite3
 import re
 import sys
 import time
@@ -229,16 +229,14 @@ for i in range(len(Items)):
 
 #%%
 # Conectar no banco de dados:
-# Dados da conexão com o BD
-user=getEnv('DB_USER')
-passw=getEnv('DB_PASSWORD')
-host=getEnv('DB_HOST')
-port=getEnv('DB_PORT')
+# Dados da conexão com o BD (utilizando SQLite)
 database=getEnv('DB_NAME')
+if not database:
+    database = 'cnpj_dados'
 
 # Conectar:
-engine = create_engine('postgresql://'+user+':'+passw+'@'+host+':'+port+'/'+database)
-conn = psycopg2.connect('dbname='+database+' '+'user='+user+' '+'host='+host+' '+'port='+port+' '+'password='+passw)
+engine = create_engine(f'sqlite:///{database}.db')
+conn = sqlite3.connect(f'{database}.db')
 cur = conn.cursor()
 
 # #%%
@@ -840,15 +838,11 @@ print("""
 ## Criar índices na base de dados [...]
 #######################################
 """)
-cur.execute("""
+cur.executescript("""
 create index if not exists empresa_cnpj on empresa(cnpj_basico);
-commit;
 create index if not exists estabelecimento_cnpj on estabelecimento(cnpj_basico);
-commit;
 create index if not exists socios_cnpj on socios(cnpj_basico);
-commit;
 create index if not exists simples_cnpj on simples(cnpj_basico);
-commit;
 """)
 conn.commit()
 print("""
