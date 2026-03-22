@@ -63,10 +63,101 @@ def to_sql(dataframe, **kwargs):
         sys.stdout.write(f'\r{progress}')
     sys.stdout.write('\n')
 
-#%%
-current_path = pathlib.Path().resolve()
+#Novo dowload
 
-dados_rf = 'http://200.152.38.155/CNPJ/'
+# ==============================
+# NOVA FONTE RECEITA (WebDAV)
+# ==============================
+from xml.etree import ElementTree as ET
+
+BASE_URL = 'https://arquivos.receitafederal.gov.br/public.php/dav/files/gn672Ad4CF8N6TK/Dados/Cadastros/CNPJ/'
+
+# Listar diretórios
+def listar_diretorios(base_url):
+    headers = {"Depth": "1"}
+    resp = requests.request("PROPFIND", base_url, headers=headers, timeout=30)
+
+    if resp.status_code != 207:
+        raise Exception(f"Erro WebDAV: {resp.status_code}")
+
+    tree = ET.fromstring(resp.content)
+    ns = {'d': 'DAV:'}
+    dirs = []
+
+    for response in tree.findall('d:response', ns):
+        href = response.find('d:href', ns).text
+        nome = href.rstrip('/').split('/')[-1]
+
+        if re.match(r'\d{4}-\d{2}', nome):
+            dirs.append(nome)
+
+    dirs.sort(reverse=True)
+    return dirs
+
+# Listar arquivos ZIP
+def listar_arquivos_zip(base_url, dir_name):
+    url = base_url + f"{dir_name}/"
+    headers = {"Depth": "1"}
+
+    resp = requests.request("PROPFIND", url, headers=headers, timeout=30)
+
+    if resp.status_code != 207:
+        raise Exception(f"Erro WebDAV: {resp.status_code}")
+
+    tree = ET.fromstring(resp.content)
+    ns = {'d': 'DAV:'}
+    files = []
+
+    for response in tree.findall('d:response', ns):
+        href = response.find('d:href', ns).text
+
+        if href.lower().endswith('.zip'):
+            full_url = "https://arquivos.receitafederal.gov.br" + href
+            files.append(full_url)
+
+    return files
+
+# Download novo
+def baixar_arquivo(url, pasta):
+    local = os.path.join(pasta, url.split('/')[-1])
+
+    if not check_diff(url, local):
+        print(f"[Pulado] {local}")
+        return
+
+    print(f"[Baixando] {url}")
+
+    try:
+        resp = requests.get(url, stream=True, timeout=60)
+        resp.raise_for_status()
+
+        with open(local, 'wb') as f:
+            for chunk in resp.iter_content(chunk_size=8192):
+                if chunk:
+                    f.write(chunk)
+
+        print(f"[OK] {local}")
+
+    except Exception as e:
+        print(f"[Erro] {e}")
+
+# ==============================
+# EXECUÇÃO
+# ==============================
+print("\nListando diretórios...")
+dirs = listar_diretorios(BASE_URL)
+
+latest_dir = dirs[0]
+print("Diretório mais recente:", latest_dir)
+
+Files = listar_arquivos_zip(BASE_URL, latest_dir)
+
+print("\nArquivos encontrados:")
+for i, f in enumerate(Files, 1):
+    print(f"{i} - {f.split('/')[-1]}")
+
+# Download
+current_path = pathlib.Path().resolve()
 
 output_files = os.path.join(current_path, 'output_files')
 makedirs(output_files)
@@ -74,80 +165,9 @@ makedirs(output_files)
 extracted_files = os.path.join(current_path, 'extracted_files')
 makedirs(extracted_files)
 
-print('Diretórios definidos: \n' +
-      'output_files: ' + str(output_files)  + '\n' +
-      'extracted_files: ' + str(extracted_files))
+for url in Files:
+    baixar_arquivo(url, output_files)
 
-#%%
-raw_html = urllib.request.urlopen(dados_rf)
-raw_html = raw_html.read()
-
-# Formatar página e converter em string
-page_items = bs.BeautifulSoup(raw_html, 'lxml')
-html_str = str(page_items)
-
-# Obter arquivos
-Files = []
-text = '.zip'
-for m in re.finditer(text, html_str):
-    i_start = m.start()-40
-    i_end = m.end()
-    i_loc = html_str[i_start:i_end].find('href=')+6
-    Files.append(html_str[i_start+i_loc:i_end])
-
-# Correcao do nome dos arquivos devido a mudanca na estrutura do HTML da pagina - 31/07/22 - Aphonso Rafael
-Files_clean = []
-for i in range(len(Files)):
-    if not Files[i].find('.zip">') > -1:
-        Files_clean.append(Files[i])
-
-try:
-    del Files
-except:
-    pass
-
-Files = Files_clean
-
-print('Arquivos que serão baixados:')
-i_f = 0
-for f in Files:
-    i_f += 1
-    print(str(i_f) + ' - ' + f)
-
-#%%
-########################################################################################################################
-## DOWNLOAD ############################################################################################################
-########################################################################################################################
-# Create this bar_progress method which is invoked automatically from wget:
-def bar_progress(current, total, width=80):
-  progress_message = "Downloading: %d%% [%d / %d] bytes - " % (current / total * 100, current, total)
-  # Don't use print() as it will print in new line every time.
-  sys.stdout.write("\r" + progress_message)
-  sys.stdout.flush()
-
-#%%
-# Download arquivos ################################################################################################################################
-i_l = 0
-for l in Files:
-    # Download dos arquivos
-    i_l += 1
-    print('Baixando arquivo:')
-    print(str(i_l) + ' - ' + l)
-    url = dados_rf+l
-    file_name = os.path.join(output_files, l)
-    if check_diff(url, file_name):
-        wget.download(url, out=output_files, bar=bar_progress)
-
-#%%
-# Download layout:
-# FIXME está pedindo login gov.br
-# Layout = 'https://www.gov.br/receitafederal/pt-br/assuntos/orientacao-tributaria/cadastros/consultas/arquivos/NOVOLAYOUTDOSDADOSABERTOSDOCNPJ.pdf'
-# print('Baixando layout:')
-# wget.download(Layout, out=output_files, bar=bar_progress)
-
-####################################################################################################################################################
-
-#%%
 # Extracting files:
 i_l = 0
 for l in Files:
