@@ -15,6 +15,7 @@ import requests
 import urllib.request
 import wget
 import zipfile
+from xml.etree import ElementTree as ET
 
 
 def check_diff(url, file_name):
@@ -64,11 +65,10 @@ def to_sql(dataframe, **kwargs):
     sys.stdout.write('\n')
 
 #Novo dowload
-
 # ==============================
 # NOVA FONTE RECEITA (WebDAV)
 # ==============================
-from xml.etree import ElementTree as ET
+
 
 BASE_URL = 'https://arquivos.receitafederal.gov.br/public.php/dav/files/gn672Ad4CF8N6TK/Dados/Cadastros/CNPJ/'
 
