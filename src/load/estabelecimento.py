@@ -11,6 +11,7 @@ def carregar_estabelecimento(arquivos, pasta, engine):
 
         part = 0
 
+        #pra não estourar a memória
         while True:
             df = pd.read_csv(
                 path,
@@ -23,17 +24,25 @@ def carregar_estabelecimento(arquivos, pasta, engine):
 
             if df.empty:
                 break
-
+            #alguns dados de establishment não tem correspondencia
             df.columns = [
-                'cnpj_basico','cnpj_ordem','cnpj_dv','identificador_matriz_filial',
-                'nome_fantasia','situacao_cadastral','data_situacao_cadastral',
-                'motivo_situacao_cadastral','nome_cidade_exterior','pais',
-                'data_inicio_atividade','cnae_fiscal_principal','cnae_fiscal_secundaria',
-                'tipo_logradouro','logradouro','numero','complemento','bairro','cep','uf',
-                'municipio','ddd_1','telefone_1','ddd_2','telefone_2','ddd_fax','fax',
-                'correio_eletronico','situacao_especial','data_situacao_especial'
+                'basic_cnpj','order_cnpj','cnpj_verification_digit','main_or_branch',
+                'name','registration_status_code',
+                'data_situacao_cadastral',
+                'registration_status_reason_code','foreign_city_name','country_code',
+                'start_activity_date','primary_cnae_code','secondary_cnae_code',
+                'tipo_logradouro',
+                'logradouro','numero',
+                'complemento',
+                'bairro',
+                'cep'
+                ,'state','city_code',
+                'ddd_1','telefone_1','ddd_2','telefone_2','ddd_fax','fax',
+                'correio_eletronico',
+                'special_status',
+                'data_situacao_especial'
             ]
 
-            to_sql(df, name='estabelecimento', con=engine, if_exists='append', index=False)
+            to_sql(df, name='establishment', con=engine, if_exists='append', index=False)
 
             part += 1
