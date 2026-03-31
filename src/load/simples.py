@@ -2,6 +2,7 @@ import pandas as pd
 import os
 from src.utils.db_utils import to_sql
 
+#O simples é a taxação/taxation
 def carregar_simples(arquivos, pasta, engine):
     for arq in arquivos:
         print(f'Simples: {arq}')
@@ -21,8 +22,8 @@ def carregar_simples(arquivos, pasta, engine):
             )
 
             df.columns = [
-                'cnpj_basico','opcao_pelo_simples','data_opcao_simples',
-                'data_exclusao_simples','opcao_mei','data_opcao_mei','data_exclusao_mei'
+                'basic_cnpj','option_for_simples_taxation','simples_taxation_option_date',
+                'simples_taxation_exclusion_date','option_for_mei_taxation','mei_taxation_option_date','mei_taxation_exclusion_date'
             ]
 
-            to_sql(df, name='simples', con=engine, if_exists='append', index=False)
+            to_sql(df, name='taxation', con=engine, if_exists='append', index=False)

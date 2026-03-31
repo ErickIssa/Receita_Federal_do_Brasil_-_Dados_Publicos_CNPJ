@@ -28,59 +28,68 @@ def main():
 
     print("\n=== INICIANDO PROCESSO ===\n")
 
-    # 📁 Criar pastas
+    print("Escolha o modo de execução:")
+    print("1 - Baixar novos dados e extrair (Processo completo)")
+    print("2 - Apenas extrair arquivos ZIP já presentes na pasta 'output_files'")
+    print("3 - Usar dados já extraídos na pasta 'extracted_files' (ir direto para o banco de dados)")
+    while True:
+        opcao = input("Digite a opção (1, 2 ou 3): ").strip()
+        if opcao in ['1', '2', '3']:
+            break
+        print("Opção inválida. Digite 1, 2 ou 3.")
+
     makedirs(OUTPUT_FILES)
     makedirs(EXTRACTED_FILES)
 
-    # 🌐 Buscar diretórios disponíveis
-    print("Listando diretórios...")
-    dirs = listar_diretorios(BASE_URL)
+    if opcao in ['1', '2']:
+        if opcao == '1':
+            print("Listando diretórios...")
+            dirs = listar_diretorios(BASE_URL)
 
-    dir_escolhido = dirs[-1]  # mais antigo (igual seu código original)
-    print(f"Diretório escolhido: {dir_escolhido}")
+            dir_escolhido = dirs[-1]  # mais antigo
+            print(f"Diretório escolhido: {dir_escolhido}")
 
-    # 📦 Listar arquivos
-    arquivos = listar_arquivos_zip(BASE_URL, dir_escolhido)
+            arquivos = listar_arquivos_zip(BASE_URL, dir_escolhido)
 
-    print(f"\nTotal de arquivos: {len(arquivos)}")
+            print(f"\nTotal de arquivos: {len(arquivos)}")
 
-    # ⬇️ Download
-    print("\n=== DOWNLOAD ===")
-    for url in arquivos:
-        baixar_arquivo(url, OUTPUT_FILES)
+            print("\n=== DOWNLOAD ===")
+            for url in arquivos:
+                baixar_arquivo(url, OUTPUT_FILES)
+            
+            arquivos_para_extrair = [url.split('/')[-1] for url in arquivos]
+            
+        else: # opcao 2
+            arquivos_para_extrair = [f for f in os.listdir(OUTPUT_FILES) if f.endswith('.zip')]
+            print(f"\nTotal de arquivos ZIP encontrardos localmente: {len(arquivos_para_extrair)}")
 
-    # 📂 Extração
-    print("\n=== EXTRAÇÃO ===")
-    for url in arquivos:
-        nome = url.split('/')[-1]
-        caminho_zip = f"{OUTPUT_FILES}/{nome}"
+        print("\n=== EXTRAÇÃO ===")
+        for nome in arquivos_para_extrair:
+            caminho_zip = f"{OUTPUT_FILES}/{nome}"
 
-        try:
-            extrair_zip(caminho_zip, EXTRACTED_FILES)
-            print(f"[OK] Extraído: {nome}")
-        except Exception as e:
-            print(f"[ERRO] {nome} -> {e}")
+            try:
+                extrair_zip(caminho_zip, EXTRACTED_FILES)
+                print(f"[OK] Extraído: {nome}")
+            except Exception as e:
+                print(f"[ERRO] {nome} -> {e}")
 
-    # 🔀 Separar arquivos
     print("\n=== SEPARANDO ARQUIVOS ===")
     grupos = separar_arquivos(EXTRACTED_FILES)
 
     for k, v in grupos.items():
         print(f"{k}: {len(v)} arquivos")
 
-    # 🗄️ Banco de dados
     print("\n=== CONECTANDO AO BANCO ===")
     engine = create_engine(f"sqlite:///{DATABASE}")
     conn = sqlite3.connect(DATABASE)
     cur = conn.cursor()
 
-    # 🔥 DROP tabelas (igual seu código original)
     print("\n=== LIMPANDO TABELAS ===")
     cur.executescript("""
-    DROP TABLE IF EXISTS empresa;
-    DROP TABLE IF EXISTS estabelecimento;
-    DROP TABLE IF EXISTS socios;
-    DROP TABLE IF EXISTS simples;
+    DROP TABLE IF EXISTS company;
+    DROP TABLE IF EXISTS establishment;
+    DROP TABLE IF EXISTS partner;
+    DROP TABLE IF EXISTS taxation;
     DROP TABLE IF EXISTS cnae;
     DROP TABLE IF EXISTS moti;
     DROP TABLE IF EXISTS munic;
@@ -90,7 +99,6 @@ def main():
     """)
     conn.commit()
 
-    # 🚀 LOAD
     print("\n=== INICIANDO CARGA ===\n")
 
     inicio = time.time()
@@ -100,7 +108,7 @@ def main():
     carregar_socios(grupos["socios"], EXTRACTED_FILES, engine)
     carregar_simples(grupos["simples"], EXTRACTED_FILES, engine)
 
-    # tabelas auxiliares
+    # tabelas auxiliares (tem que modficar a funcao dps)
     carregar_tabela_simples(grupos["cnae"], EXTRACTED_FILES, engine, "cnae")
     carregar_tabela_simples(grupos["moti"], EXTRACTED_FILES, engine, "moti")
     carregar_tabela_simples(grupos["munic"], EXTRACTED_FILES, engine, "munic")
@@ -111,23 +119,12 @@ def main():
     fim = time.time()
     print(f"\nTempo de carga: {round(fim - inicio)} segundos")
 
-    # Índices
-    print("\n=== CRIANDO ÍNDICES ===")
-    cur.executescript("""
-    CREATE INDEX IF NOT EXISTS idx_empresa_cnpj ON empresa(cnpj_basico);
-    CREATE INDEX IF NOT EXISTS idx_estabelecimento_cnpj ON estabelecimento(cnpj_basico);
-    CREATE INDEX IF NOT EXISTS idx_socios_cnpj ON socios(cnpj_basico);
-    CREATE INDEX IF NOT EXISTS idx_simples_cnpj ON simples(cnpj_basico);
-    """)
-    conn.commit()
 
-    print("\nÍndices criados com sucesso!")
 
-    # 🏁 Final
     fim_total = time.time()
 
     print("\n====================================")
-    print("PROCESSO FINALIZADO COM SUCESSO 🚀")
+    print("PROCESSO FINALIZADO COM SUCESSO ")
     print("====================================")
     print(f"Tempo total: {round(fim_total - inicio_total)} segundos")
 

@@ -33,3 +33,6 @@ Passo a passo para ativar o venv em um projeto Python.
 8.  Para sair do ambiente virtual:
 
     deactivate
+
+
+9.rodar codigo: python -m src.main
