@@ -29,11 +29,10 @@ def carregar_empresa(arquivos, pasta, engine):
                          encoding='latin-1',
         )
 
-        # File treatment before inserting into the base:
         df = df.reset_index()
         del df['index']
 
-        # Rename columns
+        # colunas renomeadas
         df.columns = [
             'basic_cnpj', 'name', 'legal_nature_code',
             'responsible_qualification_code', 'capital',
@@ -44,8 +43,6 @@ def carregar_empresa(arquivos, pasta, engine):
         df['capital'] = df['capital'].apply(lambda x: str(x).replace(',', '.') if isinstance(x, str) else x)
         df['capital'] = df['capital'].astype(float)
 
-        # Save data to database:
-        # Company
         to_sql(df, name='company', con=engine, if_exists='append', index=False)
         print('File ' + arquivos[e] + ' successfully inserted into the database!')
 

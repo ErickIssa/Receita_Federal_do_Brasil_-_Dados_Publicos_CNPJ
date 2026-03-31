@@ -30,11 +30,9 @@ def carregar_socios(arquivos, pasta, engine):
                          encoding='latin-1',
         )
 
-        # File treatment before inserting into the base:
         df = df.reset_index()
         del df['index']
 
-        # Rename columns
         # a coluna "data_entrada_sociedade" não existe no db anterior
         df.columns = [
             'basic_cnpj','partner_type_code','name',
@@ -43,8 +41,6 @@ def carregar_socios(arquivos, pasta, engine):
             'legal_representative_qualification_code','age_range_code'
         ]
 
-        # Save data to database:
-        # socios
         to_sql(df, name='partner', con=engine, if_exists='append', index=False)
         print('File ' + arquivos[e] + ' successfully inserted into the database!')
 

@@ -33,7 +33,6 @@ def carregar_estabelecimento(arquivos, pasta, engine):
         NROWS = 2000000
         part = 0
         while True:
-            # Using try block to avoid empty file reading exceptions if hit exactly the limit
             try:
                 df = pd.read_csv(
                     filepath_or_buffer=extracted_file_path,
@@ -50,12 +49,10 @@ def carregar_estabelecimento(arquivos, pasta, engine):
             if df.empty:
                 break
 
-            # File treatment before inserting into the base:
             df = df.reset_index()
             del df['index']
             gc.collect()
 
-            # Rename columns
             df.columns = [
                 'basic_cnpj','order_cnpj','cnpj_verification_digit','main_or_branch',
                 'name','registration_status_code',
@@ -74,8 +71,6 @@ def carregar_estabelecimento(arquivos, pasta, engine):
                 'data_situacao_especial'
             ]
 
-            # Save data to database:
-            # establishment
             to_sql(df, name='establishment', con=engine, if_exists='append', index=False)
             print('File ' + arquivos[e] + ' / ' + str(part) + ' successfully inserted into the database!')
             

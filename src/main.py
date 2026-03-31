@@ -38,36 +38,31 @@ def main():
             break
         print("Opção inválida. Digite 1, 2 ou 3.")
 
-    # 📁 Criar pastas
     makedirs(OUTPUT_FILES)
     makedirs(EXTRACTED_FILES)
 
     if opcao in ['1', '2']:
         if opcao == '1':
-            # 🌐 Buscar diretórios disponíveis
             print("Listando diretórios...")
             dirs = listar_diretorios(BASE_URL)
 
-            dir_escolhido = dirs[-1]  # mais antigo (igual seu código original)
+            dir_escolhido = dirs[-1]  # mais antigo
             print(f"Diretório escolhido: {dir_escolhido}")
 
-            # 📦 Listar arquivos
             arquivos = listar_arquivos_zip(BASE_URL, dir_escolhido)
 
             print(f"\nTotal de arquivos: {len(arquivos)}")
 
-            # ⬇️ Download
             print("\n=== DOWNLOAD ===")
             for url in arquivos:
                 baixar_arquivo(url, OUTPUT_FILES)
             
             arquivos_para_extrair = [url.split('/')[-1] for url in arquivos]
             
-        else: # opcao == '2'
+        else: # opcao 2
             arquivos_para_extrair = [f for f in os.listdir(OUTPUT_FILES) if f.endswith('.zip')]
             print(f"\nTotal de arquivos ZIP encontrardos localmente: {len(arquivos_para_extrair)}")
 
-        # 📂 Extração
         print("\n=== EXTRAÇÃO ===")
         for nome in arquivos_para_extrair:
             caminho_zip = f"{OUTPUT_FILES}/{nome}"
@@ -78,20 +73,17 @@ def main():
             except Exception as e:
                 print(f"[ERRO] {nome} -> {e}")
 
-    # 🔀 Separar arquivos
     print("\n=== SEPARANDO ARQUIVOS ===")
     grupos = separar_arquivos(EXTRACTED_FILES)
 
     for k, v in grupos.items():
         print(f"{k}: {len(v)} arquivos")
 
-    # 🗄️ Banco de dados
     print("\n=== CONECTANDO AO BANCO ===")
     engine = create_engine(f"sqlite:///{DATABASE}")
     conn = sqlite3.connect(DATABASE)
     cur = conn.cursor()
 
-    # 🔥 DROP tabelas (igual seu código original)
     print("\n=== LIMPANDO TABELAS ===")
     cur.executescript("""
     DROP TABLE IF EXISTS company;
@@ -107,7 +99,6 @@ def main():
     """)
     conn.commit()
 
-    # 🚀 LOAD
     print("\n=== INICIANDO CARGA ===\n")
 
     inicio = time.time()
@@ -117,7 +108,7 @@ def main():
     carregar_socios(grupos["socios"], EXTRACTED_FILES, engine)
     carregar_simples(grupos["simples"], EXTRACTED_FILES, engine)
 
-    # tabelas auxiliares
+    # tabelas auxiliares (tem que modficar a funcao dps)
     carregar_tabela_simples(grupos["cnae"], EXTRACTED_FILES, engine, "cnae")
     carregar_tabela_simples(grupos["moti"], EXTRACTED_FILES, engine, "moti")
     carregar_tabela_simples(grupos["munic"], EXTRACTED_FILES, engine, "munic")
@@ -128,23 +119,12 @@ def main():
     fim = time.time()
     print(f"\nTempo de carga: {round(fim - inicio)} segundos")
 
-    # Índices
-    # print("\n=== CRIANDO ÍNDICES ===")
-    # cur.executescript("""
-    # CREATE INDEX IF NOT EXISTS idx_empresa_cnpj ON empresa(cnpj_basico);
-    # CREATE INDEX IF NOT EXISTS idx_estabelecimento_cnpj ON estabelecimento(cnpj_basico);
-    # CREATE INDEX IF NOT EXISTS idx_socios_cnpj ON socios(cnpj_basico);
-    # CREATE INDEX IF NOT EXISTS idx_simples_cnpj ON simples(cnpj_basico);
-    # """)
-    # conn.commit()
 
-    # print("\nÍndices criados com sucesso!")
 
-    # 🏁 Final
     fim_total = time.time()
 
     print("\n====================================")
-    print("PROCESSO FINALIZADO COM SUCESSO 🚀")
+    print("PROCESSO FINALIZADO COM SUCESSO ")
     print("====================================")
     print(f"Tempo total: {round(fim_total - inicio_total)} segundos")
 
