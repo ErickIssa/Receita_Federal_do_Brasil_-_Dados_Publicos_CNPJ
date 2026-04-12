@@ -13,7 +13,6 @@ def carregar_simples(arquivos_simples, extracted_files, engine):
 ################################
 """)
 
-    # Drop table antes do insert
     with engine.connect() as conn:
         conn.execute(text('DROP TABLE IF EXISTS "taxation";'))
         conn.commit()
@@ -27,7 +26,6 @@ def carregar_simples(arquivos_simples, extracted_files, engine):
         except:
             pass
 
-        # Verificar tamanho do arquivo:
         print('Lendo o arquivo ' + arquivos_simples[e]+' [...]')
         simples_dtypes = ({0: object, 1: object, 2: 'Int32', 3: 'Int32', 4: object, 5: 'Int32', 6: 'Int32'})
         extracted_file_path = os.path.join(extracted_files, arquivos_simples[e])
@@ -35,7 +33,7 @@ def carregar_simples(arquivos_simples, extracted_files, engine):
         simples_lenght = sum(1 for line in open(extracted_file_path, "r"))
         print('Linhas no arquivo do Simples '+ arquivos_simples[e] +': '+str(simples_lenght))
 
-        tamanho_das_partes = 1000000 # Registros por carga
+        tamanho_das_partes = 1000000
         partes = math.ceil(simples_lenght / tamanho_das_partes)
         nrows = tamanho_das_partes
         skiprows = 0
@@ -55,11 +53,9 @@ def carregar_simples(arquivos_simples, extracted_files, engine):
                                   encoding='latin-1',
             )
 
-            # Tratamento do arquivo antes de inserir na base:
             simples = simples.reset_index()
             del simples['index']
 
-            # Renomear colunas
             simples.columns = [
                 'basic_cnpj',
                 'option_for_simples_taxation',

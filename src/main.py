@@ -21,6 +21,7 @@ from src.load.estabelecimento import carregar_estabelecimento
 from src.load.socios import carregar_socios
 from src.load.simples import carregar_simples
 from src.load.tabelas_auxiliares import carregar_tabela_simples
+from src.load.micro_company import carregar_micro_company
 
 
 def main():
@@ -91,11 +92,12 @@ def main():
     DROP TABLE IF EXISTS partner;
     DROP TABLE IF EXISTS taxation;
     DROP TABLE IF EXISTS cnae;
-    DROP TABLE IF EXISTS moti;
-    DROP TABLE IF EXISTS munic;
-    DROP TABLE IF EXISTS natju;
-    DROP TABLE IF EXISTS pais;
-    DROP TABLE IF EXISTS quals;
+    DROP TABLE IF EXISTS registration_status_reason;
+    DROP TABLE IF EXISTS city;
+    DROP TABLE IF EXISTS legal_nature;
+    DROP TABLE IF EXISTS country;
+    DROP TABLE IF EXISTS qualification;
+    DROP TABLE IF EXISTS company_size;
     """)
     conn.commit()
 
@@ -110,11 +112,14 @@ def main():
 
     # tabelas auxiliares (tem que modficar a funcao dps)
     carregar_tabela_simples(grupos["cnae"], EXTRACTED_FILES, engine, "cnae")
-    carregar_tabela_simples(grupos["moti"], EXTRACTED_FILES, engine, "moti")
-    carregar_tabela_simples(grupos["munic"], EXTRACTED_FILES, engine, "munic")
-    carregar_tabela_simples(grupos["natju"], EXTRACTED_FILES, engine, "natju")
-    carregar_tabela_simples(grupos["pais"], EXTRACTED_FILES, engine, "pais")
-    carregar_tabela_simples(grupos["quals"], EXTRACTED_FILES, engine, "quals")
+    carregar_tabela_simples(grupos["moti"], EXTRACTED_FILES, engine, "registration_status_reason")
+    carregar_tabela_simples(grupos["munic"], EXTRACTED_FILES, engine, "city")
+    carregar_tabela_simples(grupos["natju"], EXTRACTED_FILES, engine, "legal_nature")
+    carregar_tabela_simples(grupos["pais"], EXTRACTED_FILES, engine, "country")
+    carregar_tabela_simples(grupos["quals"], EXTRACTED_FILES, engine, "qualification")
+    carregar_micro_company(engine, "company_size")
+
+    
 
     fim = time.time()
     print(f"\nTempo de carga: {round(fim - inicio)} segundos")

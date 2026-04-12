@@ -32,14 +32,13 @@ def carregar_empresa(arquivos, pasta, engine):
         df = df.reset_index()
         del df['index']
 
-        # colunas renomeadas
+  
         df.columns = [
             'basic_cnpj', 'name', 'legal_nature_code',
             'responsible_qualification_code', 'capital',
             'company_size_code', 'federative_entity_responsible'
         ]
 
-        # Replace "," by "."
         df['capital'] = df['capital'].apply(lambda x: str(x).replace(',', '.') if isinstance(x, str) else x)
         df['capital'] = df['capital'].astype(float)
 
