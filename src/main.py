@@ -21,6 +21,10 @@ from src.load.estabelecimento import carregar_estabelecimento
 from src.load.socios import carregar_socios
 from src.load.simples import carregar_simples
 from src.load.tabelas_auxiliares import carregar_tabela_simples
+from src.load.micro_company import carregar_micro_company
+from src.load.registration_status import carregar_registration_status
+from src.load.partner_type import carregar_partner_type
+from src.load.age_range import carregar_age_range
 
 
 def main():
@@ -91,11 +95,15 @@ def main():
     DROP TABLE IF EXISTS partner;
     DROP TABLE IF EXISTS taxation;
     DROP TABLE IF EXISTS cnae;
-    DROP TABLE IF EXISTS moti;
-    DROP TABLE IF EXISTS munic;
-    DROP TABLE IF EXISTS natju;
-    DROP TABLE IF EXISTS pais;
-    DROP TABLE IF EXISTS quals;
+    DROP TABLE IF EXISTS registration_status_reason;
+    DROP TABLE IF EXISTS city;
+    DROP TABLE IF EXISTS legal_nature;
+    DROP TABLE IF EXISTS country;
+    DROP TABLE IF EXISTS qualification;
+    DROP TABLE IF EXISTS company_size;
+    DROP TABLE IF EXISTS registration_status;
+    DROP TABLE IF EXISTS partner_type;
+    DROP TABLE IF EXISTS age_range;
     """)
     conn.commit()
 
@@ -110,11 +118,63 @@ def main():
 
     # tabelas auxiliares (tem que modficar a funcao dps)
     carregar_tabela_simples(grupos["cnae"], EXTRACTED_FILES, engine, "cnae")
-    carregar_tabela_simples(grupos["moti"], EXTRACTED_FILES, engine, "moti")
-    carregar_tabela_simples(grupos["munic"], EXTRACTED_FILES, engine, "munic")
-    carregar_tabela_simples(grupos["natju"], EXTRACTED_FILES, engine, "natju")
-    carregar_tabela_simples(grupos["pais"], EXTRACTED_FILES, engine, "pais")
-    carregar_tabela_simples(grupos["quals"], EXTRACTED_FILES, engine, "quals")
+    carregar_tabela_simples(grupos["moti"], EXTRACTED_FILES, engine, "registration_status_reason")
+    carregar_tabela_simples(grupos["munic"], EXTRACTED_FILES, engine, "city")
+    carregar_tabela_simples(grupos["natju"], EXTRACTED_FILES, engine, "legal_nature")
+    carregar_tabela_simples(grupos["pais"], EXTRACTED_FILES, engine, "country")
+    carregar_tabela_simples(grupos["quals"], EXTRACTED_FILES, engine, "qualification")
+    carregar_micro_company(engine, "company_size")
+    carregar_registration_status(engine,"registration_status")
+    carregar_partner_type(engine, "partner_type")
+    carregar_age_range(engine, "age_range")
+
+
+    print("\n=== CRIANDO ÍNDICES ===")
+    index_start = time.time()
+    print("""
+#######################################
+## Criar índices na base de dados [...]
+#######################################
+""")
+    cur.executescript("""
+    CREATE INDEX IF NOT EXISTS company_cnpj ON company(basic_cnpj);
+    CREATE INDEX IF NOT EXISTS establishment_cnpj ON establishment(basic_cnpj);
+    CREATE INDEX IF NOT EXISTS partner_cnpj ON partner(basic_cnpj);
+    CREATE INDEX IF NOT EXISTS taxation_cnpj ON taxation(basic_cnpj);
+    CREATE INDEX IF NOT EXISTS cnae_code ON cnae(code);
+    CREATE INDEX IF NOT EXISTS registration_status_reason_code ON registration_status_reason(code);
+    CREATE INDEX IF NOT EXISTS city_code ON city(code);
+    CREATE INDEX IF NOT EXISTS legal_nature_code ON legal_nature(code);
+    CREATE INDEX IF NOT EXISTS country_code ON country(code);
+    CREATE INDEX IF NOT EXISTS qualification_code ON qualification(code);
+    CREATE INDEX IF NOT EXISTS company_size_code ON company_size(code);
+    CREATE INDEX IF NOT EXISTS registration_status_code ON registration_status(code);
+    CREATE INDEX IF NOT EXISTS partner_type_code ON partner_type(code);
+    CREATE INDEX IF NOT EXISTS age_range_code ON age_range(code);
+    """)
+    conn.commit()
+    print("""
+############################################################
+## Índices criados nas tabelas:
+   - company (basic_cnpj)
+   - establishment (basic_cnpj)
+   - partner (basic_cnpj)
+   - taxation (basic_cnpj)
+   - cnae (code)
+   - registration_status_reason (code)
+   - city (code)
+   - legal_nature (code)
+   - country (code)
+   - qualification (code)
+   - company_size (code)
+   - registration_status (code)
+   - partner_type (code)
+   - age_range (code)
+############################################################
+""")
+    index_end = time.time()
+    index_time = round(index_end - index_start)
+    print(f'Tempo para criar os índices (em segundos): {index_time}')
 
     fim = time.time()
     print(f"\nTempo de carga: {round(fim - inicio)} segundos")
