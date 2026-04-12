@@ -24,6 +24,7 @@ from src.load.tabelas_auxiliares import carregar_tabela_simples
 from src.load.micro_company import carregar_micro_company
 from src.load.registration_status import carregar_registration_status
 from src.load.partner_type import carregar_partner_type
+from src.load.age_range import carregar_age_range
 
 
 def main():
@@ -100,6 +101,9 @@ def main():
     DROP TABLE IF EXISTS country;
     DROP TABLE IF EXISTS qualification;
     DROP TABLE IF EXISTS company_size;
+    DROP TABLE IF EXISTS registration_status;
+    DROP TABLE IF EXISTS partner_type;
+    DROP TABLE IF EXISTS age_range;
     """)
     conn.commit()
 
@@ -122,6 +126,7 @@ def main():
     carregar_micro_company(engine, "company_size")
     carregar_registration_status(engine,"registration_status")
     carregar_partner_type(engine, "partner_type")
+    carregar_age_range(engine, "age_range")
 
 
     print("\n=== CRIANDO ÍNDICES ===")
@@ -143,6 +148,9 @@ def main():
     CREATE INDEX IF NOT EXISTS country_code ON country(code);
     CREATE INDEX IF NOT EXISTS qualification_code ON qualification(code);
     CREATE INDEX IF NOT EXISTS company_size_code ON company_size(code);
+    CREATE INDEX IF NOT EXISTS registration_status_code ON registration_status(code);
+    CREATE INDEX IF NOT EXISTS partner_type_code ON partner_type(code);
+    CREATE INDEX IF NOT EXISTS age_range_code ON age_range(code);
     """)
     conn.commit()
     print("""
@@ -159,6 +167,9 @@ def main():
    - country (code)
    - qualification (code)
    - company_size (code)
+   - registration_status (code)
+   - partner_type (code)
+   - age_range (code)
 ############################################################
 """)
     index_end = time.time()
