@@ -2,7 +2,7 @@ import pandas as pd
 import time
 from src.utils.db_utils import to_sql
 
-def carregar_micro_company(engine, nome_tabela):
+def carregar_partner_type(engine, nome_tabela):
     print(f'\n## Carregando tabela {nome_tabela}:\n')
     
     insert_start = time.time()
@@ -14,8 +14,8 @@ def carregar_micro_company(engine, nome_tabela):
     
     #mantenho em ingles?
     df = pd.DataFrame({
-        'code': [0, 1, 3, 5],
-        'description': ['NÃO INFORMADO', 'MICRO EMPRESA', 'EMPRESA PEQUENO PORTE', 'DEMAIS']
+        'code': [1, 2, 3],
+        'description': ['PESSOA JURÍDICA', 'PESSOA FÍSICA', 'ESTRANGEIRO']
     })
     
     df = df.astype({'code': 'Int32', 'description': object})

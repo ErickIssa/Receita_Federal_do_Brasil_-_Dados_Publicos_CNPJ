@@ -9,10 +9,14 @@ cursor = conn.cursor()
 cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
 tabelas = cursor.fetchall()
 
+# Lista para armazenar os nomes das tabelas para o print final
+nomes_encontrados = []
+
 for tabela in tabelas:
     nome_tabela = tabela['name']
+    nomes_encontrados.append(nome_tabela) # Adiciona à lista
     
-    # ALTERAÇÃO AQUI: Usei aspas simples no '=' para não conflitar com as aspas da f-string
+    # Cabeçalho da Tabela
     print(f"\n{'='*20} TABELA: {nome_tabela} {'='*20}")
     
     # 1. Print da Estrutura (Colunas)
@@ -36,5 +40,9 @@ for tabela in tabelas:
         print(f"Erro ao ler dados da tabela {nome_tabela}: {e}")
 
     print("-" * 50)
+
+# --- NOVA PARTE: Print final com os nomes das tabelas ---
+print("\nLISTA DE TABELAS PROCESSADAS:")
+print("\n".join(nomes_encontrados))
 
 conn.close()
