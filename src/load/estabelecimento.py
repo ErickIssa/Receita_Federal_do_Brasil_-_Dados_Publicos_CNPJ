@@ -59,16 +59,16 @@ def carregar_estabelecimento(arquivos, pasta, engine):
                 'data_situacao_cadastral',
                 'registration_status_reason_code','foreign_city_name','country_code',
                 'start_activity_date','primary_cnae_code','secondary_cnae_code',
-                'tipo_logradouro',
-                'logradouro','numero',
-                'complemento',
-                'bairro',
-                'cep'
+                'street_type',
+                'street_name','number',
+                'complement',
+                'neigborhood',
+                'zip_code'
                 ,'state','city_code',
-                'ddd_1','telefone_1','ddd_2','telefone_2','ddd_fax','fax',
-                'correio_eletronico',
+                'area_code_1','phone_1','area_code_2','phone_2','fax_area_code','fax',
+                'email',
                 'special_status',
-                'data_situacao_especial'
+                'special_status_date'
             ]
 
             to_sql(df, name='establishment', con=engine, if_exists='append', index=False)

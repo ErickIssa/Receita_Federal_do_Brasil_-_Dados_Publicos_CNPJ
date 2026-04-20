@@ -36,7 +36,7 @@ def carregar_socios(arquivos, pasta, engine):
         # a coluna "data_entrada_sociedade" não existe no db anterior
         df.columns = [
             'basic_cnpj','partner_type_code','name',
-            'cpf_or_cnpj','partner_qualification_code','data_entrada_sociedade',
+            'cpf_or_cnpj','partner_qualification_code','partnership_entry_date',
             'country_code','legal_representative_cpf','legal_representative_name',
             'legal_representative_qualification_code','age_range_code'
         ]
