@@ -134,3 +134,4 @@ dmypy.json
 /output_files
 /extracted_files
 cnpj_dados.db
+cnpj_dados.db-journal
