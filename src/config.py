@@ -8,4 +8,4 @@ BASE_PATH = pathlib.Path().resolve()
 OUTPUT_FILES = os.path.join(BASE_PATH, 'output_files')
 EXTRACTED_FILES = os.path.join(BASE_PATH, 'extracted_files')
 
-DATABASE = 'cnpj_dados.db'
+DATABASE = 'cnpj_dados_PT.db'

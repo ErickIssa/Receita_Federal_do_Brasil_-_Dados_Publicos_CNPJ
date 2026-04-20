@@ -14,11 +14,11 @@ def carregar_registration_status(engine, nome_tabela):
     
     #mantenho em ingles?
     df = pd.DataFrame({
-        'code': [1, 2, 3, 4, 8],
-        'description': ['NULA', 'ATIVA', 'SUSPENSA', 'INAPTA', 'BAIXADA']
+        'codigo': [1, 2, 3, 4, 8],
+        'descricao': ['NULA', 'ATIVA', 'SUSPENSA', 'INAPTA', 'BAIXADA']
     })
     
-    df = df.astype({'code': 'Int32', 'description': object})
+    df = df.astype({'codigo': 'Int32', 'descricao': object})
     
     to_sql(df, name=nome_tabela, con=engine, if_exists='append', index=False)
     print(f'Tabela {nome_tabela} populada com sucesso no banco de dados!')

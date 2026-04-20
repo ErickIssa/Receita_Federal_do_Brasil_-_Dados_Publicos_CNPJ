@@ -14,11 +14,11 @@ def carregar_micro_company(engine, nome_tabela):
     
     #mantenho em ingles?
     df = pd.DataFrame({
-        'code': [0, 1, 3, 5],
-        'description': ['NÃO INFORMADO', 'MICRO EMPRESA', 'EMPRESA PEQUENO PORTE', 'DEMAIS']
+        'codigo': [0, 1, 3, 5],
+        'descricao': ['NÃO INFORMADO', 'MICRO EMPRESA', 'EMPRESA PEQUENO PORTE', 'DEMAIS']
     })
     
-    df = df.astype({'code': 'Int32', 'description': object})
+    df = df.astype({'codigo': 'Int32', 'descricao': object})
     
     to_sql(df, name=nome_tabela, con=engine, if_exists='append', index=False)
     print(f'Tabela {nome_tabela} populada com sucesso no banco de dados!')

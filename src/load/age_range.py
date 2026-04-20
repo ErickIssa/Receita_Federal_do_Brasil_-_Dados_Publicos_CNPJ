@@ -13,8 +13,8 @@ def carregar_age_range(engine, nome_tabela):
         pass
     
     df = pd.DataFrame({
-        'code': [1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
-        'description': [
+        'codigo': [1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
+        'descricao': [
             '0 a 12 anos',
             '13 a 20 anos',
             '21 a 30 anos',
@@ -28,7 +28,7 @@ def carregar_age_range(engine, nome_tabela):
         ]
     })
     
-    df = df.astype({'code': 'Int32', 'description': object})
+    df = df.astype({'codigo': 'Int32', 'descricao': object})
     
     to_sql(df, name=nome_tabela, con=engine, if_exists='append', index=False)
     print(f'Tabela {nome_tabela} populada com sucesso no banco de dados!')

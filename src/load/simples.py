@@ -56,19 +56,21 @@ def carregar_simples(arquivos_simples, extracted_files, engine):
             simples = simples.reset_index()
             del simples['index']
 
-            simples.columns = [
-                'basic_cnpj',
-                'option_for_simples_taxation',
-                'simples_taxation_option_date',
-                'simples_taxation_exclusion_date',
-                'option_for_mei_taxation',
-                'mei_taxation_option_date',
-                'mei_taxation_exclusion_date'
-            ]
+            simples.columns = ['cnpj_basico',
+                           'opcao_pelo_simples_nacional',
+                           'data_opcao_simples_nacional',
+                           'data_exclusao_simples_nacional',
+                           'opcao_pelo_mei',
+                           'data_opcao_mei',
+                           'data_exclusao_mei']
+
+            #Tabela: tributacao
+            #Colunas: cnpj_basico, opcao_pelo_simples_nacional, opcao_pelo_mei, data_opcao_simples_nacional, 
+            # data_exclusao_simples_nacional, data_opcao_mei, data_exclusao_mei
 
             skiprows = skiprows+nrows
 
-            to_sql(simples, name='taxation', con=engine, if_exists='append', index=False)
+            to_sql(simples, name='tributacao', con=engine, if_exists='append', index=False)
             print('Arquivo ' + arquivos_simples[e] + ' inserido com sucesso no banco de dados! - Parte '+ str(i+1))
 
             try:

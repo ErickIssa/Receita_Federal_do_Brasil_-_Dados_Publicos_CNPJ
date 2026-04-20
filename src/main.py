@@ -90,20 +90,20 @@ def main():
 
     print("\n=== LIMPANDO TABELAS ===")
     cur.executescript("""
-    DROP TABLE IF EXISTS company;
-    DROP TABLE IF EXISTS establishment;
-    DROP TABLE IF EXISTS partner;
-    DROP TABLE IF EXISTS taxation;
+    DROP TABLE IF EXISTS empresa;
+    DROP TABLE IF EXISTS estabelecimento;
+    DROP TABLE IF EXISTS socio;
+    DROP TABLE IF EXISTS tributacao;
     DROP TABLE IF EXISTS cnae;
-    DROP TABLE IF EXISTS registration_status_reason;
-    DROP TABLE IF EXISTS city;
-    DROP TABLE IF EXISTS legal_nature;
-    DROP TABLE IF EXISTS country;
-    DROP TABLE IF EXISTS qualification;
-    DROP TABLE IF EXISTS company_size;
-    DROP TABLE IF EXISTS registration_status;
-    DROP TABLE IF EXISTS partner_type;
-    DROP TABLE IF EXISTS age_range;
+    DROP TABLE IF EXISTS motivo_situacao_cadastral;
+    DROP TABLE IF EXISTS cidade;
+    DROP TABLE IF EXISTS natureza_juridica;
+    DROP TABLE IF EXISTS pais;
+    DROP TABLE IF EXISTS qualificacao;
+    DROP TABLE IF EXISTS porte_empresa;
+    DROP TABLE IF EXISTS situacao_cadastral;
+    DROP TABLE IF EXISTS tipo_socio;
+    DROP TABLE IF EXISTS faixa_etaria;
     """)
     conn.commit()
 
@@ -118,15 +118,15 @@ def main():
 
     # tabelas auxiliares (tem que modficar a funcao dps)
     carregar_tabela_simples(grupos["cnae"], EXTRACTED_FILES, engine, "cnae")
-    carregar_tabela_simples(grupos["moti"], EXTRACTED_FILES, engine, "registration_status_reason")
-    carregar_tabela_simples(grupos["munic"], EXTRACTED_FILES, engine, "city")
-    carregar_tabela_simples(grupos["natju"], EXTRACTED_FILES, engine, "legal_nature")
-    carregar_tabela_simples(grupos["pais"], EXTRACTED_FILES, engine, "country")
-    carregar_tabela_simples(grupos["quals"], EXTRACTED_FILES, engine, "qualification")
-    carregar_micro_company(engine, "company_size")
-    carregar_registration_status(engine,"registration_status")
-    carregar_partner_type(engine, "partner_type")
-    carregar_age_range(engine, "age_range")
+    carregar_tabela_simples(grupos["moti"], EXTRACTED_FILES, engine, "motivo_situacao_cadastral")
+    carregar_tabela_simples(grupos["munic"], EXTRACTED_FILES, engine, "cidade")
+    carregar_tabela_simples(grupos["natju"], EXTRACTED_FILES, engine, "natureza_juridica")
+    carregar_tabela_simples(grupos["pais"], EXTRACTED_FILES, engine, "pais")
+    carregar_tabela_simples(grupos["quals"], EXTRACTED_FILES, engine, "qualificacao")
+    carregar_micro_company(engine, "porte_empresa")
+    carregar_registration_status(engine,"situacao_cadastral")
+    carregar_partner_type(engine, "tipo_socio")
+    carregar_age_range(engine, "faixa_etaria")
 
 
     print("\n=== CRIANDO ÍNDICES ===")
@@ -137,39 +137,39 @@ def main():
 #######################################
 """)
     cur.executescript("""
-    CREATE INDEX IF NOT EXISTS company_cnpj ON company(basic_cnpj);
-    CREATE INDEX IF NOT EXISTS establishment_cnpj ON establishment(basic_cnpj);
-    CREATE INDEX IF NOT EXISTS partner_cnpj ON partner(basic_cnpj);
-    CREATE INDEX IF NOT EXISTS taxation_cnpj ON taxation(basic_cnpj);
-    CREATE INDEX IF NOT EXISTS cnae_code ON cnae(code);
-    CREATE INDEX IF NOT EXISTS registration_status_reason_code ON registration_status_reason(code);
-    CREATE INDEX IF NOT EXISTS city_code ON city(code);
-    CREATE INDEX IF NOT EXISTS legal_nature_code ON legal_nature(code);
-    CREATE INDEX IF NOT EXISTS country_code ON country(code);
-    CREATE INDEX IF NOT EXISTS qualification_code ON qualification(code);
-    CREATE INDEX IF NOT EXISTS company_size_code ON company_size(code);
-    CREATE INDEX IF NOT EXISTS registration_status_code ON registration_status(code);
-    CREATE INDEX IF NOT EXISTS partner_type_code ON partner_type(code);
-    CREATE INDEX IF NOT EXISTS age_range_code ON age_range(code);
+    CREATE INDEX IF NOT EXISTS empresa_cnpj ON empresa(cnpj_basico);
+    CREATE INDEX IF NOT EXISTS estabelecimento_cnpj ON estabelecimento(cnpj_basico);
+    CREATE INDEX IF NOT EXISTS socio_cnpj ON socio(cnpj_basico);
+    CREATE INDEX IF NOT EXISTS tributacao_cnpj ON tributacao(cnpj_basico);
+    CREATE INDEX IF NOT EXISTS cnae_codigo ON cnae(codigo);
+    CREATE INDEX IF NOT EXISTS motivo_situacao_cadastral_codigo ON motivo_situacao_cadastral(codigo);
+    CREATE INDEX IF NOT EXISTS cidade_codigo ON cidade(codigo);
+    CREATE INDEX IF NOT EXISTS natureza_juridica_codigo ON natureza_juridica(codigo);
+    CREATE INDEX IF NOT EXISTS pais_codigo ON pais(codigo);
+    CREATE INDEX IF NOT EXISTS qualificacao_codigo ON qualificacao(codigo);
+    CREATE INDEX IF NOT EXISTS porte_empresa_codigo ON porte_empresa(codigo);
+    CREATE INDEX IF NOT EXISTS situacao_cadastral_codigo ON situacao_cadastral(codigo);
+    CREATE INDEX IF NOT EXISTS tipo_socio_codigo ON tipo_socio(codigo);
+    CREATE INDEX IF NOT EXISTS faixa_etaria_codigo ON faixa_etaria(codigo);
     """)
     conn.commit()
     print("""
 ############################################################
 ## Índices criados nas tabelas:
-   - company (basic_cnpj)
-   - establishment (basic_cnpj)
-   - partner (basic_cnpj)
-   - taxation (basic_cnpj)
-   - cnae (code)
-   - registration_status_reason (code)
-   - city (code)
-   - legal_nature (code)
-   - country (code)
-   - qualification (code)
-   - company_size (code)
-   - registration_status (code)
-   - partner_type (code)
-   - age_range (code)
+   - empresa (cnpj_basico)
+   - estabelecimento (cnpj_basico)
+   - socio (cnpj_basico)
+   - tributacao (cnpj_basico)
+   - cnae (codigo)
+   - motivo_situacao_cadastral (codigo)
+   - cidade (codigo)
+   - natureza_juridica (codigo)
+   - pais (codigo)
+   - qualificacao (codigo)
+   - porte_empresa (codigo)
+   - situacao_cadastral (codigo)
+   - tipo_socio (codigo)
+   - faixa_etaria (codigo)
 ############################################################
 """)
     index_end = time.time()

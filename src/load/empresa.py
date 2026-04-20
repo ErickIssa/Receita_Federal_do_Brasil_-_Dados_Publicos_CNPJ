@@ -33,16 +33,13 @@ def carregar_empresa(arquivos, pasta, engine):
         del df['index']
 
   
-        df.columns = [
-            'basic_cnpj', 'name', 'legal_nature_code',
-            'responsible_qualification_code', 'capital',
-            'company_size_code', 'federative_entity_responsible'
-        ]
+        df.columns = ['cnpj_basico', 'nome', 'codigo_natureza_juridica', 'codigo_qualificacao_responsavel', 
+         'capital', 'codigo_porte_empresa', 'ente_federativo_responsavel']
 
         df['capital'] = df['capital'].apply(lambda x: str(x).replace(',', '.') if isinstance(x, str) else x)
         df['capital'] = df['capital'].astype(float)
 
-        to_sql(df, name='company', con=engine, if_exists='append', index=False)
+        to_sql(df, name='empresa', con=engine, if_exists='append', index=False)
         print('File ' + arquivos[e] + ' successfully inserted into the database!')
 
     try:

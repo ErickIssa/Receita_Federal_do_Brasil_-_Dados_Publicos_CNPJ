@@ -53,25 +53,43 @@ def carregar_estabelecimento(arquivos, pasta, engine):
             del df['index']
             gc.collect()
 
-            df.columns = [
-                'basic_cnpj','order_cnpj','cnpj_verification_digit','main_or_branch',
-                'name','registration_status_code',
-                'data_situacao_cadastral',
-                'registration_status_reason_code','foreign_city_name','country_code',
-                'start_activity_date','primary_cnae_code','secondary_cnae_code',
-                'street_type',
-                'street_name','number',
-                'complement',
-                'neigborhood',
-                'zip_code'
-                ,'state','city_code',
-                'area_code_1','phone_1','area_code_2','phone_2','fax_area_code','fax',
-                'email',
-                'special_status',
-                'special_status_date'
-            ]
+            df.columns = ['cnpj_basico',
+                                   'cnpj_ordem',
+                                   'cnpj_digito_verificador',
+                                   'matriz_ou_filial',
+                                   'nome',
+                                   'codigo_situacao_cadastral',
+                                   'data_situacao_cadastral',
+                                   'codigo_motivo_situacao_cadastral',
+                                   'nome_cidade_estrangeira',
+                                   'codigo_pais',
+                                   'data_inicio_atividade',
+                                   'codigo_cnae_principal',
+                                   'codigo_cnae_secundaria',
+                                   'tipo_logradouro',
+                                   'logradouro',
+                                   'numero',
+                                   'complemento',
+                                   'bairro',
+                                   'cep',
+                                   'estado',
+                                   'codigo_cidade',
+                                   'ddd_1',
+                                   'telefone_1',
+                                   'ddd_2',
+                                   'telefone_2',
+                                   'ddd_fax',
+                                   'fax',
+                                   'correio_eletronico',
+                                   'situacao_especial',
+                                   'data_situacao_especial']
+            
+            #Colunas: cnpj_basico, cnpj_ordem, cnpj_digito_verificador, matriz_ou_filial, nome, 
+            # data_inicio_atividade, codigo_cnae_principal, codigo_cnae_secundaria, 
+            # codigo_cidade, estado, codigo_pais, nome_cidade_estrangeira, 
+            # situacao_especial, codigo_situacao_cadastral, codigo_motivo_situacao_cadastral
 
-            to_sql(df, name='establishment', con=engine, if_exists='append', index=False)
+            to_sql(df, name='estabelecimento', con=engine, if_exists='append', index=False)
             print('File ' + arquivos[e] + ' / ' + str(part) + ' successfully inserted into the database!')
             
             if len(df) == NROWS:

@@ -1,7 +1,7 @@
 import sqlite3
 
 # Conecta ao banco de dados
-conn = sqlite3.connect('cnpj_dados.db')
+conn = sqlite3.connect('cnpj_dados_PT.db')
 conn.row_factory = sqlite3.Row 
 cursor = conn.cursor()
 

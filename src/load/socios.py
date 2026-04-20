@@ -34,14 +34,23 @@ def carregar_socios(arquivos, pasta, engine):
         del df['index']
 
         # a coluna "data_entrada_sociedade" não existe no db anterior
-        df.columns = [
-            'basic_cnpj','partner_type_code','name',
-            'cpf_or_cnpj','partner_qualification_code','partnership_entry_date',
-            'country_code','legal_representative_cpf','legal_representative_name',
-            'legal_representative_qualification_code','age_range_code'
-        ]
+        df.columns = ['cnpj_basico',
+                      'codigo_tipo_socio',
+                      'nome',
+                      'cpf_ou_cnpj',
+                      'codigo_qualificacao_socio',
+                      'data_entrada_sociedade',
+                      'codigo_pais',
+                      'cpf_representante_legal',
+                      'nome_representante_legal',
+                      'codigo_qualificacao_representante_legal',
+                      'codigo_faixa_etaria']
+        #Tabela: socio
+        #Colunas: cnpj_basico, nome, cpf_ou_cnpj, cpf_representante_legal, 
+        # nome_representante_legal, codigo_tipo_socio, codigo_qualificacao_socio, codigo_pais, 
+        # codigo_qualificacao_representante_legal, codigo_faixa_etaria
 
-        to_sql(df, name='partner', con=engine, if_exists='append', index=False)
+        to_sql(df, name='socio', con=engine, if_exists='append', index=False)
         print('File ' + arquivos[e] + ' successfully inserted into the database!')
 
     try:

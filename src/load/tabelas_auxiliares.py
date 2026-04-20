@@ -23,7 +23,7 @@ def carregar_tabela_simples(arquivos, pasta, engine, nome_tabela):
         df = df.reset_index()
         del df['index']
         
-        df.columns = ['code', 'description']
+        df.columns = ['codigo', 'descricao']
         to_sql(df, name=nome_tabela, con=engine, if_exists='append', index=False)
         print('Arquivo ' + arq + ' inserido com sucesso no banco de dados!')
 
