@@ -25,6 +25,9 @@ from src.load.micro_company import carregar_micro_company
 from src.load.registration_status import carregar_registration_status
 from src.load.partner_type import carregar_partner_type
 from src.load.age_range import carregar_age_range
+from src.load.cnae import carregar_cnae
+from src.load.country import carregar_country
+from src.load.city import carregar_city
 
 
 def main():
@@ -117,11 +120,11 @@ def main():
     carregar_simples(grupos["simples"], EXTRACTED_FILES, engine)
 
     # tabelas auxiliares (tem que modficar a funcao dps)
-    carregar_tabela_simples(grupos["cnae"], EXTRACTED_FILES, engine, "cnae")
+    carregar_cnae(grupos["cnae"], EXTRACTED_FILES, engine)
     carregar_tabela_simples(grupos["moti"], EXTRACTED_FILES, engine, "registration_status_reason")
-    carregar_tabela_simples(grupos["munic"], EXTRACTED_FILES, engine, "city")
+    carregar_city(grupos["munic"], EXTRACTED_FILES, engine)
     carregar_tabela_simples(grupos["natju"], EXTRACTED_FILES, engine, "legal_nature")
-    carregar_tabela_simples(grupos["pais"], EXTRACTED_FILES, engine, "country")
+    carregar_country(grupos["pais"], EXTRACTED_FILES, engine)
     carregar_tabela_simples(grupos["quals"], EXTRACTED_FILES, engine, "qualification")
     carregar_micro_company(engine, "company_size")
     carregar_registration_status(engine,"registration_status")
