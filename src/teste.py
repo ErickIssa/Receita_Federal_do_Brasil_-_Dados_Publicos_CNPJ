@@ -48,6 +48,36 @@ def explorar_banco():
     conn.close()
 
 
+import sqlite3
+
+def print_tabelas_e_colunas():
+    conn = sqlite3.connect('cnpj_dados.db')
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    # Buscar tabelas
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    tabelas = cursor.fetchall()
+
+    print("\n=== ESTRUTURA DO BANCO DE DADOS ===\n")
+
+    for tabela in tabelas:
+        nome_tabela = tabela['name']
+
+        print(f"Tabela: {nome_tabela}")
+
+        # Buscar colunas
+        cursor.execute(f"PRAGMA table_info({nome_tabela});")
+        colunas = cursor.fetchall()
+
+        for coluna in colunas:
+            print(f"  - {coluna['name']} ({coluna['type']})")
+
+        print("-" * 40)
+
+    conn.close()
+
+
 # =========================
 # OPÇÃO 2 - TESTAR QUERIES
 # =========================
@@ -104,6 +134,7 @@ if __name__ == "__main__":
 
     if opcao == "1":
         explorar_banco()
+        print_tabelas_e_colunas()
     elif opcao == "2":
         testar_queries()
     else:
