@@ -1,5 +1,6 @@
 import sqlite3
 import os
+import pandas as pd
 from datasets import load_dataset
 
 
@@ -48,14 +49,11 @@ def explorar_banco():
     conn.close()
 
 
-import sqlite3
-
 def print_tabelas_e_colunas():
     conn = sqlite3.connect('cnpj_dados.db')
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
-    # Buscar tabelas
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
     tabelas = cursor.fetchall()
 
@@ -66,7 +64,6 @@ def print_tabelas_e_colunas():
 
         print(f"Tabela: {nome_tabela}")
 
-        # Buscar colunas
         cursor.execute(f"PRAGMA table_info({nome_tabela});")
         colunas = cursor.fetchall()
 
@@ -79,10 +76,10 @@ def print_tabelas_e_colunas():
 
 
 # =========================
-# OPÇÃO 2 - TESTAR QUERIES
+# OPÇÃO 2 - TESTAR QUERIES DATASET
 # =========================
 def testar_queries():
-    database_path = os.path.join("cnpj_dados.db")
+    database_path = os.path.join('cnpj_dados.db')
     dataset = load_dataset("ErickIssa/Gemini100questions", split="train")
 
     conn = sqlite3.connect(database_path)
@@ -123,19 +120,78 @@ def testar_queries():
 
 
 # =========================
-# ESCOLHA DO USUÁRIO
+# OPÇÃO 3 - TESTAR QUERIES DO EXCEL
+# =========================
+def testar_queries_excel():
+    caminho = "perguntas_cnpj.xlsx"
+
+    try:
+        df = pd.read_excel(caminho)
+
+        # Coluna B = índice 1 | Coluna F = índice 5
+        question_ids = df.iloc[:, 1]
+        queries = df.iloc[:, 5]
+
+        conn = sqlite3.connect('cnpj_dados.db')
+        cursor = conn.cursor()
+
+        validas = 0
+        vazias = 0
+        erros = 0
+
+        for qid, query in zip(question_ids, queries):
+
+            if pd.isna(query):
+                continue
+
+            print(f"\n--- Question ID: {qid} ---")
+
+            try:
+                cursor.execute(query)
+                resultado = cursor.fetchone()
+
+                if resultado is None:
+                    print("⚠️ Consulta vazia")
+                    vazias += 1
+                else:
+                    print("✅ Retornou resultado")
+                    validas += 1
+
+            except Exception as e:
+                print("❌ Erro:", e)
+                erros += 1
+
+        print("\nResumo:")
+        print(f"Com resultado: {validas}")
+        print(f"Vazias: {vazias}")
+        print(f"Erros: {erros}")
+
+        conn.close()
+
+    except Exception as e:
+        print(f"❌ Erro ao processar Excel: {e}")
+
+
+# =========================
+# MENU PRINCIPAL
 # =========================
 if __name__ == "__main__":
     print("Escolha uma opção:")
     print("1 - Explorar estrutura do banco")
     print("2 - Testar queries do dataset")
+    print("3 - Testar queries do Excel")
 
-    opcao = input("Digite 1 ou 2: ")
+    opcao = input("Digite 1, 2 ou 3: ")
 
     if opcao == "1":
         explorar_banco()
         print_tabelas_e_colunas()
+
     elif opcao == "2":
         testar_queries()
+
+    elif opcao == "3":
+        testar_queries_excel()
+
     else:
         print("Opção inválida!")
