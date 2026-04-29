@@ -21,6 +21,9 @@ from src.load.estabelecimento import carregar_estabelecimento
 from src.load.socios import carregar_socios
 from src.load.simples import carregar_simples
 from src.load.tabelas_auxiliares import carregar_tabela_simples
+from src.load.cidade import carregar_cidade
+from src.load.cnae import carregar_cnae
+from src.load.pais import carregar_pais
 from src.load.micro_company import carregar_micro_company
 from src.load.registration_status import carregar_registration_status
 from src.load.partner_type import carregar_partner_type
@@ -117,11 +120,11 @@ def main():
     carregar_simples(grupos["simples"], EXTRACTED_FILES, engine)
 
     # tabelas auxiliares (tem que modficar a funcao dps)
-    carregar_tabela_simples(grupos["cnae"], EXTRACTED_FILES, engine, "cnae")
+    carregar_cnae(grupos["cnae"], EXTRACTED_FILES, engine, "cnae")
     carregar_tabela_simples(grupos["moti"], EXTRACTED_FILES, engine, "motivo_situacao_cadastral")
-    carregar_tabela_simples(grupos["munic"], EXTRACTED_FILES, engine, "cidade")
+    carregar_cidade(grupos["munic"], EXTRACTED_FILES, engine, "cidade")
     carregar_tabela_simples(grupos["natju"], EXTRACTED_FILES, engine, "natureza_juridica")
-    carregar_tabela_simples(grupos["pais"], EXTRACTED_FILES, engine, "pais")
+    carregar_pais(grupos["pais"], EXTRACTED_FILES, engine, "pais")
     carregar_tabela_simples(grupos["quals"], EXTRACTED_FILES, engine, "qualificacao")
     carregar_micro_company(engine, "porte_empresa")
     carregar_registration_status(engine,"situacao_cadastral")

@@ -1,48 +1,167 @@
 import sqlite3
+import os
+import pandas as pd
+from datasets import load_dataset
 
-# Conecta ao banco de dados
-conn = sqlite3.connect('cnpj_dados_PT.db')
-conn.row_factory = sqlite3.Row 
-cursor = conn.cursor()
 
-# Pega os nomes de todas as tabelas
-cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-tabelas = cursor.fetchall()
+# =========================
+# FUNÇÃO NOVA - CARREGAR EXCEL LOCAL
+# =========================
+def carregar_excel_local():
+    caminho = "perguntas_cnpj.xlsx"  # mesmo diretório do script e do banco
 
-# Lista para armazenar os nomes das tabelas para o print final
-nomes_encontrados = []
-
-for tabela in tabelas:
-    nome_tabela = tabela['name']
-    nomes_encontrados.append(nome_tabela) # Adiciona à lista
-    
-    # Cabeçalho da Tabela
-    print(f"\n{'='*20} TABELA: {nome_tabela} {'='*20}")
-    
-    # 1. Print da Estrutura (Colunas)
-    cursor.execute(f"PRAGMA table_info({nome_tabela});")
-    colunas = [col['name'] for col in cursor.fetchall()]
-    print(f"COLUNAS: {', '.join(colunas)}")
-    print("-" * 50)
-    
-    # 2. Print de Amostra de Dados
     try:
-        cursor.execute(f"SELECT * FROM {nome_tabela} LIMIT 3;")
-        linhas = cursor.fetchall()
+        if not os.path.exists(caminho):
+            raise FileNotFoundError(f"Arquivo não encontrado: {caminho}")
+
+        df = pd.read_excel(caminho)
+
+        print("\n✅ Arquivo carregado com sucesso!")
+        print("\nPrimeiras linhas:")
+        print(df.head())
+
+        print("\nColunas disponíveis:")
+        print(list(df.columns))
+
+    except Exception as e:
+        print(f"\n❌ Erro ao carregar Excel: {e}")
+
+
+# =========================
+# OPÇÃO 1 - EXPLORAR BANCO
+# =========================
+def explorar_banco():
+    conn = sqlite3.connect('cnpj_dados_PT.db')
+    conn.row_factory = sqlite3.Row 
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    tabelas = cursor.fetchall()
+
+    nomes_encontrados = []
+
+    for tabela in tabelas:
+        nome_tabela = tabela['name']
+        nomes_encontrados.append(nome_tabela)
         
-        if not linhas:
-            print(" [Tabela vazia] ")
-        else:
-            for i, linha in enumerate(linhas, 1):
-                dados_formatados = dict(linha)
-                print(f"Registro {i}: {dados_formatados}")
-    except sqlite3.Error as e:
-        print(f"Erro ao ler dados da tabela {nome_tabela}: {e}")
+        print(f"\n{'='*20} TABELA: {nome_tabela} {'='*20}")
+        
+        cursor.execute(f"PRAGMA table_info({nome_tabela});")
+        colunas = [col['name'] for col in cursor.fetchall()]
+        print(f"COLUNAS: {', '.join(colunas)}")
+        print("-" * 50)
+        
+        try:
+            cursor.execute(f"SELECT * FROM {nome_tabela} LIMIT 3;")
+            linhas = cursor.fetchall()
+            
+            if not linhas:
+                print(" [Tabela vazia] ")
+            else:
+                for i, linha in enumerate(linhas, 1):
+                    print(f"Registro {i}: {dict(linha)}")
 
-    print("-" * 50)
+        except sqlite3.Error as e:
+            print(f"Erro ao ler dados da tabela {nome_tabela}: {e}")
 
-# --- NOVA PARTE: Print final com os nomes das tabelas ---
-print("\nLISTA DE TABELAS PROCESSADAS:")
-print("\n".join(nomes_encontrados))
+        print("-" * 50)
 
-conn.close()
+    print("\nLISTA DE TABELAS PROCESSADAS:")
+    print("\n".join(nomes_encontrados))
+
+    conn.close()
+
+
+def print_tabelas_e_colunas():
+    conn = sqlite3.connect('cnpj_dados_PT.db')
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    tabelas = cursor.fetchall()
+
+    print("\n=== ESTRUTURA DO BANCO DE DADOS ===\n")
+
+    for tabela in tabelas:
+        nome_tabela = tabela['name']
+
+        print(f"Tabela: {nome_tabela}")
+
+        cursor.execute(f"PRAGMA table_info({nome_tabela});")
+        colunas = cursor.fetchall()
+
+        for coluna in colunas:
+            print(f"  - {coluna['name']} ({coluna['type']})")
+
+        print("-" * 40)
+
+    conn.close()
+
+
+# =========================
+# OPÇÃO 2 - TESTAR QUERIES
+# =========================
+def testar_queries():
+    database_path = os.path.join('cnpj_dados_PT.db')
+    dataset = load_dataset("ErickIssa/Gemini100questions", split="train")
+
+    conn = sqlite3.connect(database_path)
+    cursor = conn.cursor()
+
+    validas = 0
+    vazias = 0
+    erros = 0
+
+    for i, query in enumerate(dataset['rewritten_sql']):
+        if i == 34:
+            print(f"\n--- Query {i} PULADA ---")
+            continue
+
+        print(f"\n--- Query {i} ---")
+
+        try:
+            cursor.execute(query)
+            resultado = cursor.fetchone()
+
+            if resultado is None:
+                print("⚠️ Consulta vazia")
+                vazias += 1
+            else:
+                print("✅ Retornou resultado")
+                validas += 1
+
+        except Exception as e:
+            print("❌ Erro:", e)
+            erros += 1
+
+    print("\nResumo:")
+    print(f"Com resultado: {validas}")
+    print(f"Vazias: {vazias}")
+    print(f"Erros: {erros}")
+
+    conn.close()
+
+
+# =========================
+# MENU PRINCIPAL
+# =========================
+if __name__ == "__main__":
+    print("Escolha uma opção:")
+    print("1 - Explorar estrutura do banco")
+    print("2 - Testar queries do dataset")
+    print("3 - Carregar Excel local")
+
+    opcao = input("Digite 1, 2 ou 3: ")
+
+    if opcao == "1":
+        explorar_banco()
+        print_tabelas_e_colunas()
+
+    elif opcao == "2":
+        testar_queries()
+
+    elif opcao == "3":
+        carregar_excel_local()
+
+    else:
+        print("Opção inválida!")
