@@ -128,23 +128,31 @@ def testar_queries_excel():
     try:
         df = pd.read_excel(caminho)
 
-        # Coluna B = índice 1 | Coluna F = índice 5
-        question_ids = df.iloc[:, 1]
+        # Coluna B = índice 1 | Coluna C = índice 2 | Coluna F = índice 5
+        question_ids = df.iloc[:, 0]
+        flags = df.iloc[:, 2]   # <- coluna C
         queries = df.iloc[:, 5]
 
-        conn = sqlite3.connect('cnpj_dados.db')
+        conn = sqlite3.connect('cnpjEN.db')
         cursor = conn.cursor()
 
         validas = 0
         vazias = 0
         erros = 0
+        puladas = 0
 
-        for qid, query in zip(question_ids, queries):
+        for qid, flag, query in zip(question_ids, flags, queries):
 
             if pd.isna(query):
                 continue
 
             print(f"\n--- Question ID: {qid} ---")
+
+            # 🔴 Se coluna C for 0 → pular
+            if flag == 0 or qid < 139:
+                print("⏭️ Pulado (flag = 0 na coluna C)")
+                puladas += 1
+                continue
 
             try:
                 cursor.execute(query)
@@ -165,13 +173,12 @@ def testar_queries_excel():
         print(f"Com resultado: {validas}")
         print(f"Vazias: {vazias}")
         print(f"Erros: {erros}")
+        print(f"Puladas: {puladas}")
 
         conn.close()
 
     except Exception as e:
         print(f"❌ Erro ao processar Excel: {e}")
-
-
 # =========================
 # MENU PRINCIPAL
 # =========================

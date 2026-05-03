@@ -36,7 +36,7 @@ def carregar_empresa(arquivos, pasta, engine):
         df.columns = [
             'basic_cnpj', 'name', 'legal_nature_code',
             'responsible_qualification_code', 'capital',
-            'company_size_code', 'federative_entity_responsible'
+            'company_size_code', 'responsible_federative_entity'
         ]
 
         df['capital'] = df['capital'].apply(lambda x: str(x).replace(',', '.') if isinstance(x, str) else x)
