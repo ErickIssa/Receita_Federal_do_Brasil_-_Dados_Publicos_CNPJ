@@ -56,7 +56,7 @@ def carregar_estabelecimento(arquivos, pasta, engine):
             df.columns = [
                 'basic_cnpj','order_cnpj','cnpj_verification_digit','main_or_branch',
                 'name','registration_status_code',
-                'data_situacao_cadastral',
+                'registration_status_date',
                 'registration_status_reason_code','foreign_city_name','country_code',
                 'start_activity_date','primary_cnae_code','secondary_cnae_code',
                 'street_type',
