@@ -14,6 +14,9 @@ Nesse repositório consta um processo de ETL para **i)** baixar os arquivos; **i
 
 Para selecionar o idioma das tabelas que serão extraídas, deve-se trocar de branch no repositório antes de iniciar o processo de processamento ou build. Esta arquitetura garante que os esquemas de dados, cabeçalhos e metadados específicos de cada região permaneçam isolados, evitando a contaminação de traduções e garantindo a integridade dos dados locais.
 
+- [Inglês](https://github.com/ErickIssa/Receita_Federal_do_Brasil_-_Dados_Publicos_CNPJ/tree/Ingles)
+- [Português](https://github.com/ErickIssa/Receita_Federal_do_Brasil_-_Dados_Publicos_CNPJ/tree/Português)
+
 ### Infraestrutura necessária:
 - [Python 3.8](https://www.python.org/downloads/release/python-3810/)
 - [SQLite]
