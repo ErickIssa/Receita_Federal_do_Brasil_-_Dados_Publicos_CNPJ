@@ -10,9 +10,13 @@ Nesse repositório consta um processo de ETL para **i)** baixar os arquivos; **i
 
 ---------------------
 
+# Extração em Inglês e em Inglês
+
+Para selecionar o idioma das tabelas que serão extraídas, deve-se trocar de branch no repositório antes de iniciar o processo de processamento ou build. Esta arquitetura garante que os esquemas de dados, cabeçalhos e metadados específicos de cada região permaneçam isolados, evitando a contaminação de traduções e garantindo a integridade dos dados locais.
+
 ### Infraestrutura necessária:
 - [Python 3.8](https://www.python.org/downloads/release/python-3810/)
-- [PostgreSQL 14.2](https://www.postgresql.org/download/)
+- [SQLite]
 
 ---------------------
 
