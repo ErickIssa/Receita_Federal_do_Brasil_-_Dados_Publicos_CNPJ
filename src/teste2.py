@@ -1,19 +1,27 @@
 import sqlite3
 
 def executar_sql_manual():
-    conn = sqlite3.connect('cnpj_dados.db')
+    conn = sqlite3.connect('cnpjEN.db')
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
     print("Cole sua query SQL abaixo (digite 'sair' para encerrar):\n")
 
-    while True:
-        query = input("SQL> ")
+    query = """
+SELECT company.name,
+       partner.name,
+       age_range.description
+FROM company
+JOIN partner ON company.basic_cnpj = partner.basic_cnpj
+JOIN age_range ON partner.age_range_code = age_range.code
+JOIN legal_nature ON company.legal_nature_code = legal_nature.code
+WHERE age_range.description = '0 a 12 anos'
+  AND legal_nature.description = 'Sociedade Empresária Limitada'
+LIMIT 2;
+  """
+        #query = " select description from legal_nature"
 
-        if query.lower() == "sair":
-            break
-
-        try:
+    try:
             cursor.execute(query)
 
             # Se for SELECT, mostra resultados
@@ -31,8 +39,8 @@ def executar_sql_manual():
                 conn.commit()
                 print("✅ Query executada com sucesso.")
 
-        except Exception as e:
-            print("❌ Erro:", e)
+    except Exception as e:
+        print("❌ Erro:", e)
 
     conn.close()
 
