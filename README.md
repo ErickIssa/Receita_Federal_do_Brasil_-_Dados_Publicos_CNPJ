@@ -59,4 +59,4 @@ python src/main.py
 - Pelo volume de dados, as tabelas  `company`, `establishment`, `partner` e `taxation` possuem índices para a coluna `basic_cnpj`, que é a principal chave de ligação entre elas.
 
 ### Modelo de Entidade Relacionamento:
-![alt text](https://github.com/aphonsoar/Receita_Federal_do_Brasil_-_Dados_Publicos_CNPJ/blob/master/Dados_RFB_ERD.png)
+![alt text](https://github.com/ErickIssa/Receita_Federal_do_Brasil_-_Dados_Publicos_CNPJ/blob/Ingles/Receita_Federal_do_Brasil_-_Dados_Publico.png)
