@@ -40,23 +40,23 @@ python src/main.py
 
 ### Tabelas geradas:
 - Para maiores informações, consulte o [layout](https://www.gov.br/receitafederal/pt-br/assuntos/orientacao-tributaria/cadastros/consultas/arquivos/NOVOLAYOUTDOSDADOSABERTOSDOCNPJ.pdf).
-  - `company`: dados cadastrais da empresa em nível de matriz
-  - `establishment`: dados analíticos da empresa por unidade / estabelecimento (telefones, endereço, filial, etc)
-  - `partner`: dados cadastrais dos sócios das empresas
-  - `taxation`: dados de MEI e Simples Nacional
+  - `empresa`: dados cadastrais da empresa em nível de matriz
+  - `estabelecimento`: dados analíticos da empresa por unidade / estabelecimento (telefones, endereço, filial, etc)
+  - `socio`: dados cadastrais dos sócios das empresas
+  - `taxacao`: dados de MEI e Simples Nacional
   - `cnae`: código e descrição dos CNAEs
-  - `qualification`: tabela de qualificação das pessoas físicas - sócios, responsável e representante legal.
-  - `legal_nature`: tabela de naturezas jurídicas - código e descrição.
-  - `registration_status_reason`: tabela de motivos da situação cadastral - código e descrição.
-  - `country`: tabela de países - código e descrição.
-  - `city`: tabela de municípios - código e descrição.
-  - `company_size`: tabela de porte da empresa.
-  - `registration_status`: tabela de situação cadastral.
-  - `partner_type`: tabela de identificador de sócio.
-  - `age_range`: tabela de faixas etárias.
+  - `qualificacao`: tabela de qualificação das pessoas físicas - sócios, responsável e representante legal.
+  - `natureza_juridica`: tabela de naturezas jurídicas - código e descrição.
+  - `motivo_situacao_cadastral`: tabela de motivos da situação cadastral - código e descrição.
+  - `pais`: tabela de países - código e descrição.
+  - `cidade`: tabela de municípios - código e descrição.
+  - `porte_empresa`: tabela de porte da empresa.
+  - `situacao_cadstral`: tabela de situação cadastral.
+  - `tipo_socio`: tabela de identificador de sócio.
+  - `faixa_etaria`: tabela de faixas etárias.
 
 
-- Pelo volume de dados, as tabelas  `company`, `establishment`, `partner` e `taxation` possuem índices para a coluna `basic_cnpj`, que é a principal chave de ligação entre elas.
+- Pelo volume de dados, as tabelas  `empresa`, `estabelecimento`, `socio` e `taxacao` possuem índices para a coluna `cnpj_basico`, que é a principal chave de ligação entre elas.
 
 ### Modelo de Entidade Relacionamento:
-![alt text](https://github.com/ErickIssa/Receita_Federal_do_Brasil_-_Dados_Publicos_CNPJ/blob/Ingles/Receita_Federal_do_Brasil_-_Dados_Publico.png)
+![alt text](https://github.com/ErickIssa/Receita_Federal_do_Brasil_-_Dados_Publicos_CNPJ/blob/Portugues/DiagramaBancoPT.png)
