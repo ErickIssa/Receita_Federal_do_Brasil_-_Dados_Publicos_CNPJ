@@ -71,7 +71,8 @@ def carregar_estabelecimento(arquivos, pasta, engine):
                 'special_status_date'
             ]
 
-            to_sql(df, name='establishment', con=engine, if_exists='append', index=False)
+            df.set_index('basic_cnpj', inplace=True)
+            to_sql(df, name='establishment', con=engine, if_exists='append', index=True)
             print('File ' + arquivos[e] + ' / ' + str(part) + ' successfully inserted into the database!')
             
             if len(df) == NROWS:

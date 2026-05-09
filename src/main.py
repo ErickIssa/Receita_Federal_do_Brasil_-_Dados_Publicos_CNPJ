@@ -91,12 +91,14 @@ def main():
     conn = sqlite3.connect(DATABASE)
     cur = conn.cursor()
 
-    print("\n=== LIMPANDO TABELAS ===")
+    print("\n=== LIMPANDO E CRIANDO TABELAS COM CHAVES ===")
     cur.executescript("""
+    PRAGMA foreign_keys = ON;
+    
+    DROP TABLE IF EXISTS taxation;
+    DROP TABLE IF EXISTS partner;
     DROP TABLE IF EXISTS company;
     DROP TABLE IF EXISTS establishment;
-    DROP TABLE IF EXISTS partner;
-    DROP TABLE IF EXISTS taxation;
     DROP TABLE IF EXISTS cnae;
     DROP TABLE IF EXISTS registration_status_reason;
     DROP TABLE IF EXISTS city;
@@ -107,6 +109,144 @@ def main():
     DROP TABLE IF EXISTS registration_status;
     DROP TABLE IF EXISTS partner_type;
     DROP TABLE IF EXISTS age_range;
+
+    CREATE TABLE age_range (
+        code INTEGER PRIMARY KEY,
+        description TEXT
+    );
+
+    CREATE TABLE city (
+        code INTEGER PRIMARY KEY,
+        name TEXT
+    );
+
+    CREATE TABLE cnae (
+        code INTEGER PRIMARY KEY,
+        name TEXT
+    );
+
+    CREATE TABLE company_size (
+        code INTEGER PRIMARY KEY,
+        description TEXT
+    );
+
+    CREATE TABLE country (
+        code INTEGER PRIMARY KEY,
+        name TEXT
+    );
+
+    CREATE TABLE legal_nature (
+        code INTEGER PRIMARY KEY,
+        description TEXT
+    );
+
+    CREATE TABLE partner_type (
+        code INTEGER PRIMARY KEY,
+        description TEXT
+    );
+
+    CREATE TABLE qualification (
+        code INTEGER PRIMARY KEY,
+        description TEXT
+    );
+
+    CREATE TABLE registration_status (
+        code INTEGER PRIMARY KEY,
+        description TEXT
+    );
+
+    CREATE TABLE registration_status_reason (
+        code INTEGER PRIMARY KEY,
+        description TEXT
+    );
+
+    CREATE TABLE establishment (
+        basic_cnpj TEXT,
+        order_cnpj TEXT,
+        cnpj_verification_digit TEXT,
+        main_or_branch INTEGER,
+        name TEXT,
+        registration_status_code INTEGER,
+        registration_status_date INTEGER,
+        registration_status_reason_code INTEGER,
+        foreign_city_name TEXT,
+        country_code INTEGER,
+        start_activity_date INTEGER,
+        primary_cnae_code INTEGER,
+        secondary_cnae_code TEXT,
+        street_type TEXT,
+        street_name TEXT,
+        number TEXT,
+        complement TEXT,
+        neigborhood TEXT,
+        zip_code TEXT,
+        state TEXT,
+        city_code INTEGER,
+        area_code_1 TEXT,
+        phone_1 TEXT,
+        area_code_2 TEXT,
+        phone_2 TEXT,
+        fax_area_code TEXT,
+        fax TEXT,
+        email TEXT,
+        special_status TEXT,
+        special_status_date INTEGER,
+
+        PRIMARY KEY (basic_cnpj, order_cnpj, cnpj_verification_digit),
+        FOREIGN KEY (primary_cnae_code) REFERENCES cnae(code),
+        FOREIGN KEY (city_code) REFERENCES city(code),
+        FOREIGN KEY (country_code) REFERENCES country(code),
+        FOREIGN KEY (registration_status_code) REFERENCES registration_status(code),
+        FOREIGN KEY (registration_status_reason_code) REFERENCES registration_status_reason(code)
+    );
+
+    CREATE TABLE company (
+        basic_cnpj TEXT PRIMARY KEY,
+        name TEXT,
+        legal_nature_code INTEGER,
+        responsible_qualification_code INTEGER,
+        capital FLOAT,
+        company_size_code INTEGER,
+        responsible_federative_entity TEXT,
+
+        FOREIGN KEY (basic_cnpj) REFERENCES establishment(basic_cnpj),
+        FOREIGN KEY (legal_nature_code) REFERENCES legal_nature(code),
+        FOREIGN KEY (responsible_qualification_code) REFERENCES qualification(code),
+        FOREIGN KEY (company_size_code) REFERENCES company_size(code)
+    );
+
+    CREATE TABLE partner (
+        basic_cnpj TEXT,
+        partner_type_code INTEGER,
+        name TEXT,
+        cpf_or_cnpj TEXT,
+        partner_qualification_code INTEGER,
+        partnership_entry_date INTEGER,
+        country_code INTEGER,
+        legal_representative_cpf TEXT,
+        legal_representative_name TEXT,
+        legal_representative_qualification_code INTEGER,
+        age_range_code INTEGER,
+
+        FOREIGN KEY (basic_cnpj) REFERENCES establishment(basic_cnpj),
+        FOREIGN KEY (partner_type_code) REFERENCES partner_type(code),
+        FOREIGN KEY (partner_qualification_code) REFERENCES qualification(code),
+        FOREIGN KEY (legal_representative_qualification_code) REFERENCES qualification(code),
+        FOREIGN KEY (country_code) REFERENCES country(code),
+        FOREIGN KEY (age_range_code) REFERENCES age_range(code)
+    );
+
+    CREATE TABLE taxation (
+        basic_cnpj TEXT,
+        option_for_simples_taxation TEXT,
+        simples_taxation_option_date INTEGER,
+        simples_taxation_exclusion_date INTEGER,
+        option_for_mei_taxation TEXT,
+        mei_taxation_option_date INTEGER,
+        mei_taxation_exclusion_date INTEGER,
+
+        FOREIGN KEY (basic_cnpj) REFERENCES establishment(basic_cnpj)
+    );
     """)
     conn.commit()
 
