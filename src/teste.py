@@ -8,7 +8,7 @@ from datasets import load_dataset
 # FUNÇÃO NOVA - CARREGAR EXCEL LOCAL
 # =========================
 def carregar_excel_local():
-    caminho = "perguntas_cnpj.xlsx"  # mesmo diretório do script e do banco
+    caminho = "cnpj.xlsx"  # mesmo diretório do script e do banco
 
     try:
         if not os.path.exists(caminho):

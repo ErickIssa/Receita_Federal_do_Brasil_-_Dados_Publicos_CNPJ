@@ -91,12 +91,14 @@ def main():
     conn = sqlite3.connect(DATABASE)
     cur = conn.cursor()
 
-    print("\n=== LIMPANDO TABELAS ===")
+    print("\n=== CRIANDO ESTRUTURA DO BANCO (PKs e FKs) ===")
     cur.executescript("""
+    PRAGMA foreign_keys = ON;
+
+    DROP TABLE IF EXISTS tributacao;
+    DROP TABLE IF EXISTS socio;
     DROP TABLE IF EXISTS empresa;
     DROP TABLE IF EXISTS estabelecimento;
-    DROP TABLE IF EXISTS socio;
-    DROP TABLE IF EXISTS tributacao;
     DROP TABLE IF EXISTS cnae;
     DROP TABLE IF EXISTS motivo_situacao_cadastral;
     DROP TABLE IF EXISTS cidade;
@@ -107,6 +109,144 @@ def main():
     DROP TABLE IF EXISTS situacao_cadastral;
     DROP TABLE IF EXISTS tipo_socio;
     DROP TABLE IF EXISTS faixa_etaria;
+
+    CREATE TABLE faixa_etaria (
+        codigo INTEGER PRIMARY KEY,
+        descricao TEXT
+    );
+
+    CREATE TABLE cidade (
+        codigo INTEGER PRIMARY KEY,
+        nome TEXT
+    );
+
+    CREATE TABLE cnae (
+        codigo INTEGER PRIMARY KEY,
+        nome TEXT
+    );
+
+    CREATE TABLE porte_empresa (
+        codigo INTEGER PRIMARY KEY,
+        descricao TEXT
+    );
+
+    CREATE TABLE pais (
+        codigo INTEGER PRIMARY KEY,
+        nome TEXT
+    );
+
+    CREATE TABLE natureza_juridica (
+        codigo INTEGER PRIMARY KEY,
+        descricao TEXT
+    );
+
+    CREATE TABLE tipo_socio (
+        codigo INTEGER PRIMARY KEY,
+        descricao TEXT
+    );
+
+    CREATE TABLE qualificacao (
+        codigo INTEGER PRIMARY KEY,
+        descricao TEXT
+    );
+
+    CREATE TABLE situacao_cadastral (
+        codigo INTEGER PRIMARY KEY,
+        descricao TEXT
+    );
+
+    CREATE TABLE motivo_situacao_cadastral (
+        codigo INTEGER PRIMARY KEY,
+        descricao TEXT
+    );
+
+    CREATE TABLE estabelecimento (
+        cnpj_basico TEXT,
+        cnpj_ordem TEXT,
+        cnpj_digito_verificador TEXT,
+        matriz_ou_filial INTEGER,
+        nome TEXT,
+        codigo_situacao_cadastral INTEGER,
+        data_situacao_cadastral INTEGER,
+        codigo_motivo_situacao_cadastral INTEGER,
+        nome_cidade_estrangeira TEXT,
+        codigo_pais INTEGER,
+        data_inicio_atividade INTEGER,
+        codigo_cnae_principal INTEGER,
+        codigo_cnae_secundaria TEXT,
+        tipo_logradouro TEXT,
+        logradouro TEXT,
+        numero TEXT,
+        complemento TEXT,
+        bairro TEXT,
+        cep TEXT,
+        estado TEXT,
+        codigo_cidade INTEGER,
+        ddd_1 TEXT,
+        telefone_1 TEXT,
+        ddd_2 TEXT,
+        telefone_2 TEXT,
+        ddd_fax TEXT,
+        fax TEXT,
+        correio_eletronico TEXT,
+        situacao_especial TEXT,
+        data_situacao_especial INTEGER,
+
+        PRIMARY KEY (cnpj_basico, cnpj_ordem, cnpj_digito_verificador),
+        FOREIGN KEY (codigo_cnae_principal) REFERENCES cnae(codigo),
+        FOREIGN KEY (codigo_cidade) REFERENCES cidade(codigo),
+        FOREIGN KEY (codigo_pais) REFERENCES pais(codigo),
+        FOREIGN KEY (codigo_situacao_cadastral) REFERENCES situacao_cadastral(codigo),
+        FOREIGN KEY (codigo_motivo_situacao_cadastral) REFERENCES motivo_situacao_cadastral(codigo)
+    );
+
+    CREATE TABLE empresa (
+        cnpj_basico TEXT PRIMARY KEY,
+        nome TEXT,
+        codigo_natureza_juridica INTEGER,
+        codigo_qualificacao_responsavel INTEGER,
+        capital FLOAT,
+        codigo_porte_empresa INTEGER,
+        ente_federativo_responsavel TEXT,
+
+        FOREIGN KEY (cnpj_basico) REFERENCES estabelecimento(cnpj_basico),
+        FOREIGN KEY (codigo_natureza_juridica) REFERENCES natureza_juridica(codigo),
+        FOREIGN KEY (codigo_qualificacao_responsavel) REFERENCES qualificacao(codigo),
+        FOREIGN KEY (codigo_porte_empresa) REFERENCES porte_empresa(codigo)
+    );
+
+    CREATE TABLE socio (
+        cnpj_basico TEXT,
+        codigo_tipo_socio INTEGER,
+        nome TEXT,
+        cpf_ou_cnpj TEXT,
+        codigo_qualificacao_socio INTEGER,
+        data_entrada_sociedade INTEGER,
+        codigo_pais INTEGER,
+        cpf_representante_legal TEXT,
+        nome_representante_legal TEXT,
+        codigo_qualificacao_representante_legal INTEGER,
+        codigo_faixa_etaria INTEGER,
+
+        FOREIGN KEY (cnpj_basico) REFERENCES estabelecimento(cnpj_basico),
+        FOREIGN KEY (codigo_tipo_socio) REFERENCES tipo_socio(codigo),
+        FOREIGN KEY (codigo_qualificacao_socio) REFERENCES qualificacao(codigo),
+        FOREIGN KEY (codigo_qualificacao_representante_legal) REFERENCES qualificacao(codigo),
+        FOREIGN KEY (codigo_pais) REFERENCES pais(codigo),
+        FOREIGN KEY (codigo_faixa_etaria) REFERENCES faixa_etaria(codigo)
+    );
+
+    CREATE TABLE tributacao (
+        cnpj_basico TEXT,
+        opcao_pelo_simples_nacional TEXT,
+        data_opcao_simples_nacional INTEGER,
+        data_exclusao_simples_nacional INTEGER,
+        opcao_pelo_mei TEXT,
+        data_opcao_mei INTEGER,
+        data_exclusao_mei INTEGER,
+
+        FOREIGN KEY (cnpj_basico) REFERENCES estabelecimento(cnpj_basico)
+    );
     """)
     conn.commit()
 
@@ -114,12 +254,7 @@ def main():
 
     inicio = time.time()
 
-    carregar_empresa(grupos["empresa"], EXTRACTED_FILES, engine)
-    carregar_estabelecimento(grupos["estabelecimento"], EXTRACTED_FILES, engine)
-    carregar_socios(grupos["socios"], EXTRACTED_FILES, engine)
-    carregar_simples(grupos["simples"], EXTRACTED_FILES, engine)
-
-    # tabelas auxiliares (tem que modficar a funcao dps)
+    # 1. Tabelas auxiliares (precisam ser carregadas antes por causa das FKs)
     carregar_cnae(grupos["cnae"], EXTRACTED_FILES, engine, "cnae")
     carregar_tabela_simples(grupos["moti"], EXTRACTED_FILES, engine, "motivo_situacao_cadastral")
     carregar_cidade(grupos["munic"], EXTRACTED_FILES, engine, "cidade")
@@ -130,6 +265,12 @@ def main():
     carregar_registration_status(engine,"situacao_cadastral")
     carregar_partner_type(engine, "tipo_socio")
     carregar_age_range(engine, "faixa_etaria")
+
+    # 2. Tabelas principais
+    carregar_empresa(grupos["empresa"], EXTRACTED_FILES, engine)
+    carregar_estabelecimento(grupos["estabelecimento"], EXTRACTED_FILES, engine)
+    carregar_socios(grupos["socios"], EXTRACTED_FILES, engine)
+    carregar_simples(grupos["simples"], EXTRACTED_FILES, engine)
 
 
     print("\n=== CRIANDO ÍNDICES ===")
