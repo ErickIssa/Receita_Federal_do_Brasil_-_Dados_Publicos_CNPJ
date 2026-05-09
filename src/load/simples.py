@@ -13,9 +13,7 @@ def carregar_simples(arquivos_simples, extracted_files, engine):
 ################################
 """)
 
-    with engine.connect() as conn:
-        conn.execute(text('DROP TABLE IF EXISTS "taxation";'))
-        conn.commit()
+    # O DROP TABLE foi movido para o main.py para permitir a criação prévia com chaves primárias e estrangeiras.
 
     simples_insert_start = time.time()
 
